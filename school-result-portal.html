@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ফলাফল অনুসন্ধান — বিদ্যালয় রেজাল্ট পোর্টাল</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Questrial&family=Noto+Sans+Bengali:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ===================================================================
+   DESIGN TOKENS
+   Subject: an official school result / mark-sheet portal.
+   Palette drawn from certificate paper, wax seals and ledger ink.
+=================================================================== */
+:root{
+  --paper:        #F8F4E9;
+  --paper-raised: #FFFDF7;
+  --navy:         #10213D;
+  --navy-2:       #1C3159;
+  --gold:         #B8863A;
+  --gold-light:   #E4C377;
+  --maroon:       #7A2731;
+  --green:        #2C5A3F;
+  --ink:          #1B1A17;
+  --ink-soft:     #5B564B;
+  --line:         #D9CFB6;
+  --line-strong:  #B9AD8A;
+
+  --font-display: 'Noto Sans Bengali', 'Questrial', sans-serif;
+  --font-body:    'Noto Sans Bengali', 'Questrial', sans-serif;
+  --font-latin:   'Questrial', 'Noto Sans Bengali', sans-serif;
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --shadow-card: 0 20px 50px -20px rgba(16,33,61,0.35);
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.55;
+}
+h1,h2,h3{margin:0;font-family:var(--font-display);font-weight:700;}
+p{margin:0;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+
+.eyebrow{
+  display:inline-block;
+  font-family:var(--font-latin);
+  font-size:12px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--gold);
+  font-weight:700;
+  margin-bottom:14px;
+}
+.eyebrow--light{color:var(--gold-light);}
+
+/* ===================================================================
+   TOP BAR
+=================================================================== */
+.topbar{
+  background:var(--navy);
+  color:var(--paper);
+  border-bottom:3px solid var(--gold);
+}
+.topbar__inner{
+  max-width:1180px;
+  margin:0 auto;
+  padding:16px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.brand{display:flex;align-items:center;gap:14px;}
+.brand__seal{color:var(--gold-light);width:38px;height:38px;flex:none;}
+.brand__seal-svg{width:100%;height:100%;}
+.brand__text{display:flex;flex-direction:column;line-height:1.25;}
+.brand__name{font-weight:700;font-size:18px;letter-spacing:.01em;}
+.brand__tag{font-family:var(--font-latin);font-size:11.5px;color:#B9C4DA;letter-spacing:.04em;}
+.topbar__badge{
+  font-family:var(--font-latin);
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--gold-light);
+  border:1px solid rgba(228,195,119,.45);
+  padding:6px 12px;
+  border-radius:999px;
+}
+
+/* ===================================================================
+   HERO / SEARCH
+=================================================================== */
+.hero{
+  position:relative;
+  background:var(--navy);
+  color:var(--paper);
+  overflow:hidden;
+  padding:64px 28px 96px;
+}
+.hero__pattern{
+  position:absolute;inset:0;
+  opacity:.16;
+  background-image:
+    repeating-radial-gradient(circle at 85% 20%, transparent 0 34px, rgba(228,195,119,.5) 35px 36px, transparent 37px 70px),
+    repeating-radial-gradient(circle at 15% 85%, transparent 0 26px, rgba(228,195,119,.35) 27px 28px, transparent 29px 54px);
+  pointer-events:none;
+}
+.hero__inner{
+  position:relative;
+  max-width:1180px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 460px;
+  gap:56px;
+  align-items:start;
+}
+.hero__copy{padding-top:12px;}
+.hero__title{
+  font-size:clamp(30px,4vw,44px);
+  line-height:1.22;
+  margin-bottom:18px;
+}
+.hero__desc{
+  max-width:480px;
+  color:#C7CEDD;
+  font-size:15.5px;
+}
+
+/* search card */
+.searchcard{
+  position:relative;
+  background:var(--paper-raised);
+  color:var(--ink);
+  border-radius:var(--radius-md);
+  padding:32px 30px 26px;
+  box-shadow:var(--shadow-card);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px 14px;
+}
+.searchcard__corner{
+  position:absolute;
+  width:22px;height:22px;
+  border-color:var(--gold);
+  opacity:.9;
+}
+.searchcard__corner--tl{top:10px;left:10px;border-top:2px solid var(--gold);border-left:2px solid var(--gold);}
+.searchcard__corner--br{bottom:10px;right:10px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold);}
+
+.field{display:flex;flex-direction:column;gap:6px;grid-column:1 / -1;}
+.field--half{grid-column:span 1;}
+.field label{font-size:13px;font-weight:600;color:var(--ink-soft);}
+.req{color:var(--maroon);}
+.field input,.field select{
+  border:1.4px solid var(--line);
+  background:#fff;
+  border-radius:var(--radius-sm);
+  padding:11px 13px;
+  font-size:15px;
+  color:var(--ink);
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.field input::placeholder{color:#B0A98F;}
+.field input:focus,.field select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(184,134,58,.18);
+}
+.field input:invalid:not(:placeholder-shown){border-color:var(--maroon);}
+
+.btn{
+  border:none;
+  border-radius:var(--radius-sm);
+  font-weight:700;
+  font-size:15px;
+  padding:12px 20px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+}
+.btn:active{transform:translateY(1px);}
+.btn:focus-visible{outline:3px solid var(--gold-light);outline-offset:2px;}
+.btn--primary{
+  background:var(--maroon);
+  color:#fff;
+  grid-column:1 / -1;
+}
+.btn--primary:hover{background:#8C2E39;}
+.btn--full{width:100%;}
+.btn--ghost{background:transparent;color:var(--navy);border:1.4px solid var(--line-strong);}
+.btn--ghost:hover{background:#F0EADA;}
+.btn--outline{background:transparent;color:var(--maroon);border:1.4px solid var(--maroon);}
+.btn--outline:hover{background:rgba(122,39,49,.06);}
+
+.searchcard__hint{
+  grid-column:1 / -1;
+  font-size:12.5px;
+  color:var(--ink-soft);
+  margin-top:2px;
+  font-family:var(--font-latin);
+}
+.searchcard__hint strong{font-family:var(--font-mono);color:var(--navy);}
+
+/* ===================================================================
+   RESULT ZONE
+=================================================================== */
+.resultzone{
+  max-width:900px;
+  margin:0 auto;
+  padding:52px 24px 90px;
+}
+
+.state{
+  text-align:center;
+  color:var(--ink-soft);
+  padding:52px 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+}
+.state[hidden]{display:none !important;}
+.resultcard[hidden]{display:none !important;}
+.state svg{color:var(--line-strong);}
+.state__title{font-weight:700;color:var(--ink);font-size:17px;}
+.state--notfound svg{color:var(--maroon);opacity:.75;}
+
+.stamp-loader{
+  width:46px;height:46px;
+  border-radius:50%;
+  border:3px solid var(--line);
+  border-top-color:var(--gold);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ===================================================================
+   RESULT CARD
+=================================================================== */
+.resultcard{
+  position:relative;
+  background:var(--paper-raised);
+  border:1px solid var(--line);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+  animation:cardIn .45s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(14px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.resultcard__watermark{
+  position:absolute;
+  right:-30px;bottom:-30px;
+  width:280px;height:280px;
+  color:var(--navy);
+  opacity:.04;
+  pointer-events:none;
+}
+.resultcard__watermark svg{width:100%;height:100%;}
+
+.resultcard__head{
+  background:var(--navy);
+  color:var(--paper);
+  padding:26px 30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+.resultcard__head h2{font-size:20px;}
+.resultcard__seal{width:64px;height:64px;flex:none;color:var(--gold-light);}
+.resultcard__seal-svg{width:100%;height:100%;}
+.resultcard__seal-text{
+  font-family:var(--font-latin);
+  font-size:15px;
+  font-weight:700;
+  fill:currentColor;
+  letter-spacing:.03em;
+}
+#rc-sealWrap.is-fail{color:#E7A9A9;}
+
+.resultcard__student{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px 24px;
+  padding:28px 30px 10px;
+}
+.datablock{display:flex;flex-direction:column;gap:4px;}
+.datablock__label{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-family:var(--font-latin);}
+.datablock__value{font-size:16px;font-weight:600;color:var(--ink);}
+.datablock__value--name{font-size:19px;color:var(--navy);}
+.datablock--mono .datablock__value{font-family:var(--font-mono);font-weight:500;letter-spacing:.02em;}
+
+.resultcard__gpa{
+  position:relative;
+  display:flex;
+  gap:16px;
+  padding:22px 30px 6px;
+}
+.gpabox{
+  flex:1;
+  background:#F1EBD9;
+  border:1px solid var(--line);
+  border-radius:var(--radius-sm);
+  padding:14px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.gpabox--grade{background:#EAF1EB;border-color:#CFE0D2;}
+.gpabox__label{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-family:var(--font-latin);}
+.gpabox__value{font-family:var(--font-mono);font-size:26px;font-weight:600;color:var(--navy);}
+.gpabox--grade .gpabox__value{color:var(--green);}
+
+.resultcard__table-wrap{
+  position:relative;
+  padding:24px 30px 6px;
+  overflow-x:auto;
+}
+.subjecttable{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14.5px;
+}
+.subjecttable thead th{
+  text-align:left;
+  font-family:var(--font-latin);
+  font-size:11.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  border-bottom:2px solid var(--line-strong);
+  padding:0 10px 10px;
+}
+.subjecttable tbody td{
+  padding:11px 10px;
+  border-bottom:1px solid var(--line);
+  color:var(--ink);
+}
+.subjecttable tbody tr:last-child td{border-bottom:none;}
+.subjecttable .col-code{font-family:var(--font-mono);color:var(--ink-soft);width:64px;}
+.subjecttable .col-gp{font-family:var(--font-mono);text-align:center;width:110px;}
+.subjecttable .col-grade{text-align:center;width:90px;font-weight:700;}
+.subjecttable .col-remark{width:100px;color:var(--ink-soft);}
+.grade-pill{
+  display:inline-block;
+  min-width:34px;
+  padding:2px 8px;
+  border-radius:999px;
+  font-size:12.5px;
+  font-weight:700;
+  font-family:var(--font-latin);
+  background:#EAF1EB;
+  color:var(--green);
+}
+.grade-pill.is-warn{background:#FBEFDD;color:#8A5A15;}
+.grade-pill.is-fail{background:#F6E4E4;color:var(--maroon);}
+
+.resultcard__foot{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:24px 30px 30px;
+  border-top:1px dashed var(--line-strong);
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+.resultcard__note{font-size:12.5px;color:var(--ink-soft);max-width:320px;}
+.resultcard__actions{display:flex;gap:10px;}
+
+/* ===================================================================
+   FOOTER
+=================================================================== */
+.sitefoot{
+  text-align:center;
+  padding:26px 20px 40px;
+  color:var(--ink-soft);
+  font-size:13px;
+}
+.sitefoot__muted{margin-top:4px;font-size:12px;opacity:.75;}
+
+/* ===================================================================
+   RESPONSIVE
+=================================================================== */
+@media (max-width:900px){
+  .hero__inner{grid-template-columns:1fr;}
+  .hero__copy{padding-top:0;}
+  .resultcard__student{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:520px){
+  .topbar__inner{flex-direction:column;align-items:flex-start;gap:10px;}
+  .hero{padding:44px 18px 72px;}
+  .searchcard{grid-template-columns:1fr;padding:26px 20px 22px;}
+  .field--half{grid-column:1 / -1;}
+  .resultcard__head{flex-direction:column;align-items:flex-start;gap:14px;}
+  .resultcard__student{grid-template-columns:1fr;padding:24px 20px 6px;}
+  .resultcard__gpa{flex-direction:column;padding:20px 20px 6px;}
+  .resultcard__table-wrap{padding:20px 20px 6px;}
+  .resultcard__foot{padding:20px 20px 26px;flex-direction:column;align-items:stretch;}
+  .resultcard__actions{flex-direction:column;}
+}
+
+@media print{
+  .topbar,.hero,.sitefoot,.resultcard__actions,.state{display:none !important;}
+  body{background:#fff;}
+  .resultzone{padding:0;max-width:100%;}
+  .resultcard{box-shadow:none;border:1px solid #999;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <div class="brand__seal">
+        <svg viewBox="0 0 60 60" class="brand__seal-svg"><circle cx="30" cy="30" r="27" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="30" cy="30" r="21" fill="none" stroke="currentColor" stroke-width="0.8"/><path d="M30 12 L33 24 L45 24 L35.5 31 L39 43 L30 35.5 L21 43 L24.5 31 L15 24 L27 24 Z" fill="currentColor" opacity="0.9"/></svg>
+      </div>
+      <div class="brand__text">
+        <span class="brand__name">আদর্শ উচ্চ বিদ্যালয়</span>
+        <span class="brand__tag">Adarsha High School &amp; College</span>
+      </div>
+    </div>
+    <nav class="topbar__nav">
+      <span class="topbar__badge">EXAM RESULT PORTAL · ২০২৬</span>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO / SEARCH ============ -->
+<main>
+  <section class="hero" id="search">
+    <div class="hero__pattern" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow">রেকর্ড শাখা · তাৎক্ষণিক ফলাফল যাচাই</p>
+        <h1 class="hero__title">রোল ও রেজিস্ট্রেশন<br>দিয়ে ফলাফল খুঁজুন</h1>
+        <p class="hero__desc">পরীক্ষার্থীর রোল নম্বর এবং রেজিস্ট্রেশন নম্বর দিয়ে নিচের ফর্মটি পূরণ করুন। সংরক্ষিত তথ্যের সাথে মিলে গেলে সম্পূর্ণ ফলাফল কার্ড প্রদর্শিত হবে।</p>
+      </div>
+
+      <form class="searchcard" id="searchForm" autocomplete="off">
+        <div class="searchcard__corner searchcard__corner--tl" aria-hidden="true"></div>
+        <div class="searchcard__corner searchcard__corner--br" aria-hidden="true"></div>
+
+        <div class="field">
+          <label for="roll">রোল নম্বর <span class="req">*</span></label>
+          <input type="text" id="roll" inputmode="numeric" placeholder="যেমন: ১০৪" required>
+        </div>
+
+        <div class="field">
+          <label for="regNo">রেজিস্ট্রেশন নম্বর <span class="req">*</span></label>
+          <input type="text" id="regNo" inputmode="numeric" placeholder="যেমন: 2024118754" required>
+        </div>
+
+        <div class="field field--half">
+          <label for="examType">পরীক্ষার ধরন</label>
+          <select id="examType">
+            <option value="annual">বার্ষিক পরীক্ষা</option>
+            <option value="half">অর্ধ-বার্ষিক পরীক্ষা</option>
+            <option value="test">নির্বাচনী পরীক্ষা</option>
+          </select>
+        </div>
+
+        <div class="field field--half">
+          <label for="year">শিক্ষাবর্ষ</label>
+          <select id="year">
+            <option value="2026">২০২৬</option>
+            <option value="2025">২০২৫</option>
+            <option value="2024">২০২৪</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn--primary btn--full" id="searchBtn">
+          <span>ফলাফল দেখুন</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.6"/><path d="M12.6 12.6L16 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+
+        <p class="searchcard__hint">ডেমো রোল দেখতে চান? চেষ্টা করুন — রোল <strong>104</strong> / রেজিস্ট্রেশন <strong>2024118754</strong></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ RESULT AREA ============ -->
+  <section class="resultzone" id="resultzone">
+
+    <!-- empty state -->
+    <div class="state state--empty" id="stateEmpty">
+      <svg width="46" height="46" viewBox="0 0 46 46" fill="none"><rect x="9" y="6" width="28" height="34" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M15 16h16M15 22h16M15 28h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <p>অনুসন্ধান করা ফলাফল এখানে প্রদর্শিত হবে</p>
+    </div>
+
+    <!-- loading state -->
+    <div class="state state--loading" id="stateLoading" hidden>
+      <div class="stamp-loader" aria-hidden="true"></div>
+      <p>যাচাই করা হচ্ছে…</p>
+    </div>
+
+    <!-- not found state -->
+    <div class="state state--notfound" id="stateNotFound" hidden>
+      <svg width="46" height="46" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="17" stroke="currentColor" stroke-width="1.4"/><path d="M17 17l12 12M29 17l-12 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <p class="state__title">কোনো ফলাফল খুঁজে পাওয়া যায়নি</p>
+      <p>রোল ও রেজিস্ট্রেশন নম্বর যাচাই করে আবার চেষ্টা করুন। তথ্য সঠিকভাবে প্রবেশ করা হয়েছে কিনা নিশ্চিত করুন।</p>
+    </div>
+
+    <!-- ============ RESULT CARD (populated by JS) ============ -->
+    <article class="resultcard" id="resultCard" hidden>
+
+      <div class="resultcard__watermark" aria-hidden="true">
+        <svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="27" fill="none" stroke="currentColor" stroke-width="1"/><path d="M30 12 L33 24 L45 24 L35.5 31 L39 43 L30 35.5 L21 43 L24.5 31 L15 24 L27 24 Z" fill="currentColor"/></svg>
+      </div>
+
+      <header class="resultcard__head">
+        <div class="resultcard__head-left">
+          <span class="eyebrow eyebrow--light">অফিসিয়াল ফলাফল বিবরণী</span>
+          <h2 id="rc-examLabel">বার্ষিক পরীক্ষা — ২০২৬</h2>
+        </div>
+        <div class="resultcard__seal" id="rc-sealWrap">
+          <svg viewBox="0 0 100 100" class="resultcard__seal-svg" id="rc-sealSvg">
+            <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="2"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1"/>
+            <text id="rc-sealText" x="50" y="56" text-anchor="middle" class="resultcard__seal-text">PASS</text>
+          </svg>
+        </div>
+      </header>
+
+      <div class="resultcard__student">
+        <div class="datablock">
+          <span class="datablock__label">ছাত্র/ছাত্রীর নাম</span>
+          <span class="datablock__value datablock__value--name" id="rc-name">—</span>
+        </div>
+        <div class="datablock">
+          <span class="datablock__label">পিতার নাম</span>
+          <span class="datablock__value" id="rc-father">—</span>
+        </div>
+        <div class="datablock">
+          <span class="datablock__label">মাতার নাম</span>
+          <span class="datablock__value" id="rc-mother">—</span>
+        </div>
+        <div class="datablock datablock--mono">
+          <span class="datablock__label">রোল নম্বর</span>
+          <span class="datablock__value" id="rc-roll">—</span>
+        </div>
+        <div class="datablock datablock--mono">
+          <span class="datablock__label">রেজিস্ট্রেশন নম্বর</span>
+          <span class="datablock__value" id="rc-reg">—</span>
+        </div>
+        <div class="datablock">
+          <span class="datablock__label">শ্রেণি / শাখা</span>
+          <span class="datablock__value" id="rc-class">—</span>
+        </div>
+      </div>
+
+      <div class="resultcard__gpa">
+        <div class="gpabox">
+          <span class="gpabox__label">GPA (সর্বমোট)</span>
+          <span class="gpabox__value" id="rc-gpa">—</span>
+        </div>
+        <div class="gpabox gpabox--grade">
+          <span class="gpabox__label">সর্বমোট গ্রেড</span>
+          <span class="gpabox__value" id="rc-grade">—</span>
+        </div>
+      </div>
+
+      <div class="resultcard__table-wrap">
+        <table class="subjecttable">
+          <thead>
+            <tr>
+              <th class="col-code">কোড</th>
+              <th class="col-subject">বিষয়ের নাম</th>
+              <th class="col-gp">গ্রেড পয়েন্ট</th>
+              <th class="col-grade">গ্রেড</th>
+              <th class="col-remark">মন্তব্য</th>
+            </tr>
+          </thead>
+          <tbody id="rc-subjectBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="resultcard__foot">
+        <p class="resultcard__note">এটি একটি কম্পিউটার-জেনারেটেড ফলাফল বিবরণী। কোনো স্বাক্ষরের প্রয়োজন নেই।</p>
+        <div class="resultcard__actions">
+          <button class="btn btn--ghost" id="printBtn" type="button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6V2h8v4M4 12h8v2H4v-2ZM2.5 6h11a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H12v-3H4v3H2.5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.2"/></svg>
+            প্রিন্ট করুন
+          </button>
+          <button class="btn btn--outline" id="newSearchBtn" type="button">নতুন অনুসন্ধান</button>
+        </div>
+      </footer>
+    </article>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <p>© ২০২৬ আদর্শ উচ্চ বিদ্যালয় ও কলেজ। সর্বস্বত্ব সংরক্ষিত।</p>
+  <p class="sitefoot__muted">এই ফলাফল কেবল বিদ্যালয়ের অভ্যন্তরীণ ব্যবহারের জন্য প্রস্তুতকৃত।</p>
+</footer>
+
+<script>
+/* =====================================================================
+   DEMO DATA
+   Replace this array (or swap fetchResult() below for a real API call)
+   with your school's actual result database.
+===================================================================== */
+const RESULTS_DB = [
+  {
+    roll: "104",
+    reg: "2024118754",
+    examType: "annual",
+    year: "2026",
+    name: "সাদিয়া ইসলাম মিম",
+    father: "মোঃ রফিকুল ইসলাম",
+    mother: "রোকসানা বেগম",
+    className: "নবম শ্রেণি — বিজ্ঞান বিভাগ",
+    gpa: "5.00",
+    grade: "A+",
+    status: "pass",
+    subjects: [
+      { code: "101", name: "বাংলা ১ম পত্র", gp: "5.00", grade: "A+" },
+      { code: "102", name: "বাংলা ২য় পত্র", gp: "5.00", grade: "A+" },
+      { code: "107", name: "ইংরেজি ১ম পত্র", gp: "4.75", grade: "A" },
+      { code: "108", name: "ইংরেজি ২য় পত্র", gp: "5.00", grade: "A+" },
+      { code: "127", name: "গণিত", gp: "5.00", grade: "A+" },
+      { code: "134", name: "বিজ্ঞান", gp: "5.00", grade: "A+" },
+      { code: "150", name: "বাংলাদেশ ও বিশ্বপরিচয়", gp: "4.75", grade: "A" },
+      { code: "154", name: "তথ্য ও যোগাযোগ প্রযুক্তি", gp: "5.00", grade: "A+" },
+      { code: "146", name: "ধর্ম ও নৈতিক শিক্ষা", gp: "5.00", grade: "A+" }
+    ]
+  },
+  {
+    roll: "27",
+    reg: "2024107031",
+    examType: "annual",
+    year: "2026",
+    name: "তানভীর আহমেদ",
+    father: "মোঃ জসিম উদ্দিন",
+    mother: "শাহনাজ পারভীন",
+    className: "দশম শ্রেণি — মানবিক বিভাগ",
+    gpa: "3.61",
+    grade: "A-",
+    status: "pass",
+    subjects: [
+      { code: "101", name: "বাংলা ১ম পত্র", gp: "3.75", grade: "A" },
+      { code: "102", name: "বাংলা ২য় পত্র", gp: "3.50", grade: "A-" },
+      { code: "107", name: "ইংরেজি ১ম পত্র", gp: "3.25", grade: "B" },
+      { code: "108", name: "ইংরেজি ২য় পত্র", gp: "3.50", grade: "A-" },
+      { code: "127", name: "গণিত", gp: "3.00", grade: "B" },
+      { code: "153", name: "ইতিহাস ও বিশ্বসভ্যতা", gp: "4.00", grade: "A+" },
+      { code: "156", name: "ভূগোল ও পরিবেশ", gp: "3.75", grade: "A" },
+      { code: "146", name: "ধর্ম ও নৈতিক শিক্ষা", gp: "4.00", grade: "A+" }
+    ]
+  },
+  {
+    roll: "58",
+    reg: "2024132890",
+    examType: "half",
+    year: "2025",
+    name: "মোঃ ইমরান হোসেন",
+    father: "মোঃ আব্দুল কাদের",
+    mother: "নাজমা খাতুন",
+    className: "অষ্টম শ্রেণি",
+    gpa: "2.10",
+    grade: "C",
+    status: "warn",
+    subjects: [
+      { code: "101", name: "বাংলা ১ম পত্র", gp: "2.50", grade: "C+" },
+      { code: "102", name: "বাংলা ২য় পত্র", gp: "2.25", grade: "C" },
+      { code: "107", name: "ইংরেজি ১ম পত্র", gp: "1.00", grade: "F", remark: "অকৃতকার্য" },
+      { code: "127", name: "গণিত", gp: "2.00", grade: "C-" },
+      { code: "134", name: "বিজ্ঞান", gp: "2.50", grade: "C+" },
+      { code: "150", name: "বাংলাদেশ ও বিশ্বপরিচয়", gp: "3.00", grade: "B" }
+    ]
+  },
+  {
+    roll: "12",
+    reg: "2026100112",
+    examType: "annual",
+    year: "2026",
+    name: "নুসরাত জাহান তন্বী",
+    father: "মোঃ শাহাদাত হোসেন",
+    mother: "ফাতেমা বেগম",
+    className: "ষষ্ঠ শ্রেণি",
+    gpa: "4.83",
+    grade: "A+",
+    status: "pass",
+    subjects: [
+      { code: "101", name: "বাংলা", gp: "5.00", grade: "A+" },
+      { code: "107", name: "ইংরেজি", gp: "4.50", grade: "A" },
+      { code: "127", name: "গণিত", gp: "5.00", grade: "A+" },
+      { code: "134", name: "বিজ্ঞান", gp: "5.00", grade: "A+" },
+      { code: "150", name: "বাংলাদেশ ও বিশ্বপরিচয়", gp: "4.75", grade: "A" },
+      { code: "146", name: "ধর্ম ও নৈতিক শিক্ষা", gp: "4.75", grade: "A" }
+    ]
+  },
+  {
+    roll: "73",
+    reg: "2026100973",
+    examType: "annual",
+    year: "2026",
+    name: "রাকিবুল হাসান",
+    father: "মোঃ নুরুল আমিন",
+    mother: "সুরাইয়া আক্তার",
+    className: "সপ্তম শ্রেণি",
+    gpa: "3.33",
+    grade: "A-",
+    status: "pass",
+    subjects: [
+      { code: "101", name: "বাংলা", gp: "3.50", grade: "A-" },
+      { code: "107", name: "ইংরেজি", gp: "3.00", grade: "B" },
+      { code: "127", name: "গণিত", gp: "3.25", grade: "B" },
+      { code: "134", name: "বিজ্ঞান", gp: "3.75", grade: "A" },
+      { code: "150", name: "বাংলাদেশ ও বিশ্বপরিচয়", gp: "3.50", grade: "A-" },
+      { code: "146", name: "ধর্ম ও নৈতিক শিক্ষা", gp: "3.00", grade: "B" }
+    ]
+  },
+  {
+    roll: "205",
+    reg: "2024145520",
+    examType: "annual",
+    year: "2025",
+    name: "মাহমুদা আক্তার লিজা",
+    father: "মোঃ কামরুজ্জামান",
+    mother: "সেলিনা পারভীন",
+    className: "একাদশ শ্রেণি — বাণিজ্য বিভাগ",
+    gpa: "4.42",
+    grade: "A",
+    status: "pass",
+    subjects: [
+      { code: "253", name: "হিসাববিজ্ঞান ১ম পত্র", gp: "4.50", grade: "A" },
+      { code: "277", name: "ব্যবসায় সংগঠন ও ব্যবস্থাপনা", gp: "4.75", grade: "A" },
+      { code: "292", name: "উৎপাদন ব্যবস্থাপনা ও বিপণন", gp: "4.00", grade: "A-" },
+      { code: "107", name: "ইংরেজি ১ম পত্র", gp: "4.25", grade: "A" },
+      { code: "101", name: "বাংলা ১ম পত্র", gp: "4.50", grade: "A" },
+      { code: "154", name: "তথ্য ও যোগাযোগ প্রযুক্তি", gp: "5.00", grade: "A+" }
+    ]
+  },
+  {
+    roll: "91",
+    reg: "2024119091",
+    examType: "test",
+    year: "2026",
+    name: "মোঃ ফাহিম হোসেন",
+    father: "মোঃ ইদ্রিস আলী",
+    mother: "রাশিদা বেগম",
+    className: "দশম শ্রেণি — বিজ্ঞান বিভাগ",
+    gpa: "0.00",
+    grade: "F",
+    status: "fail",
+    subjects: [
+      { code: "101", name: "বাংলা ১ম পত্র", gp: "2.00", grade: "C-" },
+      { code: "107", name: "ইংরেজি ১ম পত্র", gp: "0.00", grade: "F", remark: "অকৃতকার্য" },
+      { code: "127", name: "গণিত", gp: "0.00", grade: "F", remark: "অকৃতকার্য" },
+      { code: "136", name: "উচ্চতর গণিত", gp: "1.00", grade: "D" },
+      { code: "137", name: "পদার্থবিজ্ঞান", gp: "0.00", grade: "F", remark: "অকৃতকার্য" },
+      { code: "138", name: "রসায়ন", gp: "2.25", grade: "C" }
+    ]
+  }
+];
+
+/* =====================================================================
+   DOM REFS
+===================================================================== */
+const form         = document.getElementById("searchForm");
+const rollInput    = document.getElementById("roll");
+const regInput     = document.getElementById("regNo");
+const examSelect   = document.getElementById("examType");
+const yearSelect   = document.getElementById("year");
+const searchBtn    = document.getElementById("searchBtn");
+
+const stateEmpty    = document.getElementById("stateEmpty");
+const stateLoading  = document.getElementById("stateLoading");
+const stateNotFound = document.getElementById("stateNotFound");
+const resultCard    = document.getElementById("resultCard");
+
+const examTypeLabels = { annual: "বার্ষিক পরীক্ষা", half: "অর্ধ-বার্ষিক পরীক্ষা", test: "নির্বাচনী পরীক্ষা" };
+
+/* =====================================================================
+   SEARCH FLOW
+===================================================================== */
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const roll = rollInput.value.trim();
+  const reg  = regInput.value.trim();
+  if (!roll || !reg) return;
+
+  showState("loading");
+  searchBtn.disabled = true;
+
+  // Simulated lookup latency so the loading / stamp state is visible.
+  // Swap this timeout + find() for a real fetch() to your backend.
+  setTimeout(() => {
+    const match = fetchResult(roll, reg);
+    searchBtn.disabled = false;
+    if (match) {
+      renderResult(match);
+      showState("result");
+      document.getElementById("resultzone").scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      showState("notfound");
+    }
+  }, 650);
+});
+
+document.getElementById("newSearchBtn").addEventListener("click", () => {
+  form.reset();
+  showState("empty");
+  document.getElementById("search").scrollIntoView({ behavior: "smooth" });
+  rollInput.focus();
+});
+
+document.getElementById("printBtn").addEventListener("click", () => window.print());
+
+/**
+ * Looks up a result by roll + registration number.
+ * Replace the body of this function with a real API call, e.g.:
+ *   const res = await fetch(`/api/results?roll=${roll}&reg=${reg}`);
+ *   return res.ok ? await res.json() : null;
+ */
+function fetchResult(roll, reg) {
+  return RESULTS_DB.find(r => r.roll === roll && r.reg === reg) || null;
+}
+
+/* =====================================================================
+   STATE SWITCHING
+===================================================================== */
+function showState(name) {
+  stateEmpty.hidden    = name !== "empty";
+  stateLoading.hidden  = name !== "loading";
+  stateNotFound.hidden = name !== "notfound";
+  resultCard.hidden    = name !== "result";
+}
+
+/* =====================================================================
+   RENDER RESULT CARD
+===================================================================== */
+function renderResult(r) {
+  document.getElementById("rc-examLabel").textContent =
+    `${examTypeLabels[r.examType] || "পরীক্ষা"} — ${toBn(r.year)}`;
+
+  document.getElementById("rc-name").textContent   = r.name;
+  document.getElementById("rc-father").textContent = r.father;
+  document.getElementById("rc-mother").textContent = r.mother;
+  document.getElementById("rc-roll").textContent   = r.roll;
+  document.getElementById("rc-reg").textContent    = r.reg;
+  document.getElementById("rc-class").textContent  = r.className;
+  document.getElementById("rc-gpa").textContent    = r.gpa;
+  document.getElementById("rc-grade").textContent  = r.grade;
+
+  const sealWrap = document.getElementById("rc-sealWrap");
+  const sealText = document.getElementById("rc-sealText");
+  const isFail = r.status === "fail" || r.subjects.some(s => s.grade === "F");
+  sealWrap.classList.toggle("is-fail", isFail);
+  sealText.textContent = isFail ? "REVIEW" : "PASS";
+
+  const tbody = document.getElementById("rc-subjectBody");
+  tbody.innerHTML = "";
+  r.subjects.forEach(s => {
+    const tr = document.createElement("tr");
+    const pillClass = s.grade === "F" ? "is-fail" : (["C", "C+", "C-", "D"].includes(s.grade) ? "is-warn" : "");
+    tr.innerHTML = `
+      <td class="col-code">${s.code}</td>
+      <td class="col-subject">${s.name}</td>
+      <td class="col-gp">${s.gp}</td>
+      <td class="col-grade"><span class="grade-pill ${pillClass}">${s.grade}</span></td>
+      <td class="col-remark">${s.remark || (s.grade === "F" ? "অকৃতকার্য" : "উত্তীর্ণ")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* Convert ASCII digits to Bengali digits for display polish. */
+function toBn(str) {
+  const map = { "0":"০","1":"১","2":"২","3":"৩","4":"৪","5":"৫","6":"৬","7":"৭","8":"৮","9":"৯" };
+  return String(str).replace(/[0-9]/g, d => map[d]);
+}
+
+</script>
+</body>
+</html>
